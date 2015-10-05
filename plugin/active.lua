@@ -63,7 +63,7 @@ return function (config)
             cache[filename](request, response)
         end, throw)
 
-        response.status = response.status or '200 OK'
+        response.status = response.status or '200 Success'
         response.header['Content-Type'] = response.header['Content-Type'] or
             'text/html'
     end

@@ -65,7 +65,7 @@ return function (config)
 
         local mime = config.mime[filename:match '[^.]*$'] or 'text/plain'
 
-        response.status = '200 OK'
+        response.status = '200 Success'
         response.header['Content-Type'] = mime
         response.header['Cache-Control'] = 'private'
         response.header['Etag'] = etag
