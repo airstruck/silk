@@ -14,6 +14,10 @@ return function (config)
 
     return function (request, response)
 
+        if not request.uri:match('^' .. config.webroot) then
+            return false
+        end
+
         local function throw (message)
             response.status = '500 Internal Server Error'
             response.header['Content-Type'] = 'text/plain'
@@ -21,19 +25,15 @@ return function (config)
             return
         end
 
+        local filename = request.path:gsub('^' .. config.webroot,
+            config.fileroot)
+
         if cache[filename] then
             xpcall(function ()
                 cache[filename](request, response)
             end, throw)
             return
         end
-
-        if not request.uri:match('^' .. config.webroot) then
-            return false
-        end
-
-        local filename = request.path:gsub('^' .. config.webroot,
-            config.fileroot)
 
         if isDirectory(filename) then
             if not request.path:match '/$' then
