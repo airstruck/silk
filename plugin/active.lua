@@ -3,6 +3,7 @@ return function (config)
     config.webroot = config.webroot or '/'
     config.fileroot = config.fileroot or '/'
     config.extension = config.extension or '.lua.html'
+    config.cache = config.cache or false
     config.code = config.code or '<%?lua(.-)%?>'
     config.echo = config.echo or '<%?=(.-)%?>'
 
@@ -28,7 +29,7 @@ return function (config)
         local filename = request.path:gsub('^' .. config.webroot,
             config.fileroot)
 
-        if cache[filename] then
+        if config.cache and cache[filename] then
             xpcall(function ()
                 cache[filename](request, response)
             end, throw)
@@ -54,13 +55,17 @@ return function (config)
 
         xpcall(function ()
             local data = read(filename)
-            local open = '\nresponse:write[============['
+            local open = '\nresponse:write[============[\n'
             local close = ']============]\n'
             local script = 'local request,response=...' .. open .. data
                 :gsub(config.echo, close .. 'response:write(%1)' .. open)
                 :gsub(config.code, close .. '%1' .. open) .. close
-            cache[filename] = loadstring(script)
-            cache[filename](request, response)
+            if config.cache then
+                cache[filename] = loadstring(script)
+                cache[filename](request, response)
+            else
+                loadstring(script)(request, response)
+            end
         end, throw)
 
         response.status = response.status or '200 Success'

@@ -31,7 +31,7 @@ local function Request (client)
     if len and len > 0 then
         data, status, part = client:receive(len)
         if status then print ('error receiving body: ' .. status) end
-        request.data = data
+        request.body = data
     end
 
     return request
